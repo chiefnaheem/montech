@@ -1,8 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { InternalServerErrorException } from '@nestjs/common';
-import mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 
 @Schema({
   timestamps: true,
@@ -34,6 +33,10 @@ export class UserEntity {
 
   @Prop()
   gender: string;
+
+  @Prop([{ type: MoviesSchema, ref: MoviesEntity.name }])
+  @Type(() => MoviesEntity)
+  nextOfKin: MoviesEntity[];
 
   static async isValidPassword(
     password: string,
