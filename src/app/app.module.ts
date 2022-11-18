@@ -1,6 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './controller/app.controller';
 import { AppService } from './service/app.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { configValidation } from '../config/validator/config.validator';
+import { envConfig } from '../config/constant/env.configuration';
 
 @Module({
   imports: [
