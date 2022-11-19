@@ -1,10 +1,13 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './controller/app.controller';
 import { AppService } from './service/app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configValidation } from '../config/validator/config.validator';
 import { envConfig } from '../config/constant/env.configuration';
+import { TokenMiddleware } from 'src/utils/middleware/token.middleware';
+import { AuthModule } from 'src/auth/auth.module';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
@@ -21,8 +24,21 @@ import { envConfig } from '../config/constant/env.configuration';
       validationSchema: configValidation,
       envFilePath: ['.env'],
     }),
+    AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    return consumer
+      .apply(TokenMiddleware)
+      .exclude(
+        { path: '/api/user/login', method: RequestMethod.POST },
+        { path: '/api/user/register', method: RequestMethod.POST },
+        )
+      .forRoutes('*');
+  }
+}

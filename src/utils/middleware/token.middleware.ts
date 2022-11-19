@@ -30,7 +30,7 @@ export class TokenMiddleware implements NestMiddleware {
     const tokenData: TokenDto = await this.tokenService.verify(token);
 
     const userID = new Types.ObjectId(tokenData._id);
-    req.user = userID;
+    req.user = userID
 
     res.locals.tokenData = tokenData;
 

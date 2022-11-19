@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { InternalServerErrorException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { MovieEntity, MovieSchema } from './movies.schema';
 import { Type } from 'class-transformer'
 @Schema({
