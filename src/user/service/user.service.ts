@@ -42,8 +42,7 @@ export class UserService {
         if (userExists) {
             throw new ConflictException('user already exists');
         }
-        //hash the password and create the user
-        // const hashedPassword = await UserEntity.hashPassword(user.password);
+
         const createdUser = new this.userModel({
             ...user,
             password: await bcrypt.hash(user.password, 10)
@@ -70,19 +69,14 @@ export class UserService {
                 throw new UnauthorizedException('invalid credentials');
             }
             const token = await this.tokenService.generateTokens(user);
-            return {
-                user,
-                token,
-            };
+            return token;
         } catch (error) {
             throw new InternalServerErrorException(error);
         }
     }
 
-    //we want to add movie for a user from an external api from 'https://api.themoviedb.org'. Movie data are gotten from this endpoint and used to create movie foruser
-    async addMovie(req: Request, movieId: number): Promise<any> {
+    async addMovie(req: Request, movieId: number): Promise<UserDocument> {
         try{
-
             //get movie data from external api
             const { data } = await this.httpService.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.API_KEY}`).toPromise();
 
@@ -101,6 +95,12 @@ export class UserService {
             if (!user) {
                 throw new NotFoundException('user not found');
             }
+            //if movie already exists for the user, throw conflict error
+            const movieExists = user.movies.find(movie => movie.id == movieId);
+            if (movieExists) {
+                throw new ConflictException('movie already exists');
+            }
+
             //add movie to user
             user.movies.push(createdMovie);
             //save user
@@ -113,7 +113,7 @@ export class UserService {
     }
 
     //get self
-    async getSelf(req: Request): Promise<any> {
+    async getSelf(req: Request): Promise<UserDocument> {
         try{
             const user: UserDocument = await this.userModel.findById(req.user);
             if (!user) {
@@ -127,9 +127,8 @@ export class UserService {
     }
 
     //we want to be able to delete movie by a user
-    async deleteMovie(req: Request, movie_id: number): Promise<any> {
+    async deleteMovie(req: Request, movie_id: number): Promise<string> {
         try{
-            //we want to check the user making request and then delete the movie from it
             const user = await this.userModel.findById(req.user);
             if (!user) {
                 throw new NotFoundException('user not found');
@@ -138,7 +137,7 @@ export class UserService {
             user.movies = user.movies.filter(movie => movie.id !== movie_id);
             //save user
             await user.save();
-            return user;
+            return 'movie successfully deleted';
         }
         catch(error){
             throw new BadGatewayException(error);
@@ -146,31 +145,67 @@ export class UserService {
     }
 
     //we want to be able to add rating to a movie by user
-    async addRating(req: Request, movie_id: number, rating: number): Promise<any> {
+    async addRating(req: Request, movie_id: number, rating: number): Promise<MovieEntity> {
         try{
-            //we want to check the user making request and then add the rating to the movie
             const user = await this.userModel.findById(req.user);
             if (!user) {
                 throw new NotFoundException('user not found');
             }
-            //add rating to movie
+
+            const movieExists = user.movies.find(movie => movie.id == movie_id);
+            
+            if (!movieExists) {
+                throw new NotFoundException('movie not found here');
+            }
             user.movies = user.movies.map(movie => {
-                if(movie.id === movie_id){
+                if(movie.id == movie_id){
                     movie.rating = rating;
                 }
+                
                 return movie;
             }
             );
             //save user
             await user.save();
             //we want to return the movie with its new rating
-            const movie = user.movies.find(movie => movie.id === movie_id);
+            const movie = user.movies.find(movie => movie.id == movie_id);
+            
             return movie;
         }
         catch(error){
             throw new InternalServerErrorException(error.message);
         }
     }
+
+    //get all movies for user
+    async getAllMovies(req: Request): Promise<MovieEntity[]> {
+        try{
+            const user = await this.userModel.findById(req.user);
+            if (!user) {
+                throw new NotFoundException('user not found');
+            }
+            return user.movies;
+        }
+        catch(error){
+            throw new InternalServerErrorException(error.message);
+        }
+    }
             
-           
+     //get single movie
+     async getSingleMovie(req: Request, movie_id: number): Promise<MovieEntity> {
+        try{
+            const user = await this.userModel.findById(req.user);
+            if (!user) {
+                throw new NotFoundException('user not found');
+            }
+            const movie = user.movies.find(movie => movie.id == movie_id);
+            if (!movie) {
+                throw new NotFoundException('movie not found');
+            }
+            return movie;
+        }
+        catch(error){
+            throw new InternalServerErrorException(error.message);
+        }
+        }      
 }

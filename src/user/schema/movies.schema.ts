@@ -12,7 +12,7 @@ export class MovieEntity {
   @Prop()
   release_date: string;
 
-  @Prop()
+  @Prop({default: 0})
   rating: number;
 
   @Prop()
