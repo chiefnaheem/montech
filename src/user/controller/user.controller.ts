@@ -11,7 +11,7 @@ export class UserController {
 
     //register
     @Post('register')
-    async register(@Body() user: RegisterDto): Promise<any> {
+    async register(@Body() user: RegisterDto) {
         return this.userService.register(user);
     }
 
