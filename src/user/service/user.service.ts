@@ -80,13 +80,11 @@ export class UserService {
     }
 
     //we want to add movie for a user from an external api from 'https://api.themoviedb.org'. Movie data are gotten from this endpoint and used to create movie foruser
-    async addMovie(req: Request, movieId: any): Promise<any> {
+    async addMovie(req: Request, movieId: number): Promise<any> {
         try{
 
             //get movie data from external api
-
-            const id = movieId.movieId
-            const { data } = await this.httpService.get(`https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.API_KEY}`).toPromise();
+            const { data } = await this.httpService.get(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${process.env.API_KEY}`).toPromise();
 
             //create movie
             const createdMovie = new this.movieModel({

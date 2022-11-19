@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Req, Res, Delete } from '@nestjs/common';
 import { RegisterDto } from '../dto/register.dto';
 import { UserService } from '../service/user.service';
 
@@ -29,8 +29,14 @@ export class UserController {
 
     //add movie
     @Post('add-movie')
-    async addMovie( @Req() req: any, @Body() movieId: number): Promise<any> {
+    async addMovie( @Req() req: any, @Body('movieId') movieId: number): Promise<any> {
         return this.userService.addMovie(req, movieId);
+    }
+
+    //delete movie
+    @Delete('delete-movie')
+    async deleteMovie( @Req() req: any, @Body('movieId') movieId: number): Promise<any> {
+        return this.userService.deleteMovie(req, movieId);
     }
 
 }
