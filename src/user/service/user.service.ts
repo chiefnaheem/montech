@@ -163,7 +163,9 @@ export class UserService {
             );
             //save user
             await user.save();
-            return user;
+            //we want to return the movie with its new rating
+            const movie = user.movies.find(movie => movie.id === movie_id);
+            return movie;
         }
         catch(error){
             throw new InternalServerErrorException(error.message);
