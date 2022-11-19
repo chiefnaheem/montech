@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, Req, Res, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Req, Res, Delete, Patch } from '@nestjs/common';
 import { RegisterDto } from '../dto/register.dto';
 import { UserService } from '../service/user.service';
 
@@ -38,5 +38,11 @@ export class UserController {
     async deleteMovie( @Req() req: any, @Body('movieId') movieId: number): Promise<any> {
         return this.userService.deleteMovie(req, movieId);
     }
+
+    @Patch('add-rating/:movieId')
+    async addRating(@Req() req: any, @Param('movieId') movieId: number, @Body('rating') rating: number): Promise<any> {
+        return this.userService.addRating(req, movieId, rating);
+    }
+
 
 }
