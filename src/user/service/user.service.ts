@@ -207,5 +207,20 @@ export class UserService {
         catch(error){
             throw new InternalServerErrorException(error.message);
         }
-        }      
+        }   
+
+        //rank movies by rating   
+        async rankMovies(req: Request): Promise<MovieEntity[]> {
+            try{
+                const user = await this.userModel.findById(req.user);
+                if (!user) {
+                    throw new NotFoundException('user not found');
+                }
+                const movies = user.movies.sort((a, b) => b.rating - a.rating);
+                return movies;
+            }
+            catch(error){
+                throw new InternalServerErrorException(error.message);
+            }
+        }
 }

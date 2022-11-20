@@ -21,7 +21,7 @@ export class UserController {
         return this.userService.login(email, password);
     }
 
-    //get self(user) which is gotten by checking the user making request through the auth token
+    //get self
     @Get('self')
     async getSelf(@Req() req: any) {
         return this.userService.getSelf(req);
@@ -54,6 +54,12 @@ export class UserController {
     @Get('movie/:movieId')
     async getMovie(@Req() req: any, @Param('movieId') movieId: number) {
         return this.userService.getSingleMovie(req, movieId);
+    }
+
+    //rank movies
+    @Get('rank-movies')
+    async rankMovies(@Req() req: any) {
+        return this.userService.rankMovies(req);
     }
 
 }

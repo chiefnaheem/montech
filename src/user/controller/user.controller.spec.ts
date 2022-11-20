@@ -12,6 +12,11 @@ describe('UserController', () => {
             _id: v4(),
             ...dto
         }
+    }),
+    login: jest.fn(dto => {
+        return {
+            token: v4()
+        }
     })
   }
 
@@ -41,7 +46,13 @@ describe('UserController', () => {
     })
 
     it('should login user', () => {
-        
+        const user = {
+            email: "test@test.com",
+            password: 'test1234'
+        }
+        expect(userController.login(user.email, user.password).toEqual({
+            token: v4()
+        }))
     })
 
   
